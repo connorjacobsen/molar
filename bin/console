@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'molar'
+
+require 'pry'
+Pry.start
+
+# Simple debugging class configured with Molar
+class Jedi
+  include Molar
+
+  def initialize(attributes = {})
+    @attributes = attributes
+  end
+end
