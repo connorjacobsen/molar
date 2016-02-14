@@ -33,55 +33,36 @@ module Molar
       private :attributes
 
       def method_missing(method, *args, &block)
-        action = __attribute?(method) ? :__register : :__method_missing
-        send(action, method, *args, &block)
+        __attribute?(method) ? __register_and_call(method, *args, &block) : super
       end
     end
   end
   private_class_method :included
-
-  def __register(method, *args)
-    if __setter?(method)
-      attr = __attr_name(method)
-      __add_setter(attr)
-      send(method, *args)
-    else
-      __add_getter(method)
-      send(method)
-    end
-  end
-  private :__register
 
   def __attribute?(name)
     attributes.key?(__attr_name(name))
   end
   private :__attribute?
 
-  def __setter?(method)
-    __attribute?(method) && method.to_s.end_with?('=')
+  def __register_and_call(method, *args, &block)
+    __register(method)
+    send(method, *args, &block)
   end
-  private :__setter?
+  private :__register_and_call
 
-  def __attribute(attribute)
-    attributes[attribute]
+  def __register(method)
+    attr_name = __attr_name(method)
+    __add_methods(attr_name)
   end
-  private :__attribute
+  private :__register
 
-  def __add_getter(attribute)
+  def __add_methods(attribute)
     singleton_class.instance_eval do
-      define_method(attribute) { __attribute(attribute) }
+      define_method(attribute) { attributes[attribute] }
+      define_method("#{attribute}=") { |val| attributes[attribute] = val }
     end
   end
-  private :__add_getter
-
-  def __add_setter(attribute)
-    singleton_class.instance_eval do
-      define_method("#{attribute}=") do |value|
-        attributes[attribute] = value
-      end
-    end
-  end
-  private :__add_setter
+  private :__add_methods
 
   def __attr_name(attribute)
     str_attr = attribute.to_s
