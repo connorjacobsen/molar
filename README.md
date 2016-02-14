@@ -4,6 +4,12 @@ Molar dynamically defines attribute hash getters and setters for your classes.
 
 *Work in progress*
 
+#### Comparison to OpenStruct
+
+`OpenStruct` defines all getters and setters for your hash upon initialization, and will allow you to dynamically add new attributes to your object.
+
+`Molar` lazily defines getters and setters for your hash, and will _not_ allow you to directly add new attributes after initialization (unless you explicitly add them to the attributes hash).
+
 ## Installation
 
 Add this line to your application's Gemfile:
